@@ -1,49 +1,59 @@
 <?php
-// print_r($_POST);
 session_start();
 
-if (isset($_POST['correo']) && isset($_POST['contrasena'])) {
-    echo "Entrando al bloque de autenticación<br>";
-    require_once './connection.php';
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ../registro_adm/index.html');
+    exit;
+}
 
-    $correo = $_POST['correo'];
-    $contrasena = $_POST['contrasena'];
+$correo = isset($_POST['correo']) ? trim($_POST['correo']) : '';
+$contrasena = isset($_POST['contrasena']) ? trim($_POST['contrasena']) : '';
 
-    echo "correo: $correo, Contraseña: $contrasena<br>";
+if ($correo === '' || $contrasena === '') {
+    $_SESSION['error'] = 'Debes ingresar correo y contraseña.';
+    header('Location: ../registro_adm/index.html');
+    exit;
+}
 
-    $sql = "SELECT id_administrador, nombre, apellido_paterno, apellido_materno, correo, contrasena
-            FROM administradores
-            WHERE correo = '$correo' AND contrasena = '$contrasena'";
+require_once './connection.php';
 
-    $result = $conn->query($sql);
+$sql = "SELECT id_administrador, nombre, apellido_paterno, apellido_materno, correo
+        FROM administradores
+        WHERE correo = ? AND contrasena = ?
+        LIMIT 1";
 
-    if (!$result) {
-        die("Error en la consulta SQL: " . $conn->error);
-    }
+$stmt = $conn->prepare($sql);
 
-    if ($result->num_rows > 0) {
-        echo "Usuario encontrado<br>";
-        $row = $result->fetch_assoc();
-        
-            $_SESSION['correo'] = $row['correo'];
-            $_SESSION['contrasena'] = $row['contrasena'];
-            $_SESSION['id_administrador'] = $row['id_administrador'];
-            $_SESSION['nombre'] = $row['nombre'];
-            $_SESSION['apellido_paterno'] = $row['apellido_paterno'];
-            $_SESSION['apellido_materno'] = $row['apellido_materno'];
-            header("Location: ../vista_admin/index.php");
-            exit;
-        } else if ($row['estado'] == 'Activo') {
-            $_SESSION['error'] = "El usuario ya inició sesión";
-            header("Location: ../registro_adm/index.html");
-            exit;
-        }
-    } //else {
-        //echo "No se encontraron usuarios con esas credenciales<br>";
-        //$_SESSION['error'] = "El usuario o contraseña son incorrectos";
-        //header("Location: ../index.html");
-        exit;
-    
+if (!$stmt) {
+    $_SESSION['error'] = 'No fue posible preparar la consulta de autenticación.';
+    header('Location: ../registro_adm/index.html');
+    exit;
+}
 
+$stmt->bind_param('ss', $correo, $contrasena);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result && $result->num_rows === 1) {
+    $row = $result->fetch_assoc();
+
+    $_SESSION['id_administrador'] = $row['id_administrador'];
+    $_SESSION['nombre'] = $row['nombre'];
+    $_SESSION['apellido_paterno'] = $row['apellido_paterno'];
+    $_SESSION['apellido_materno'] = $row['apellido_materno'];
+    $_SESSION['correo'] = $row['correo'];
+
+    $stmt->close();
+    $conn->close();
+
+    header('Location: ../vista_admin/index.php');
+    exit;
+}
+
+$stmt->close();
+$conn->close();
+
+$_SESSION['error'] = 'Correo o contraseña incorrectos.';
+header('Location: ../registro_adm/index.html');
+exit;
 ?>
-
