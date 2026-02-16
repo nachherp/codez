@@ -2,12 +2,28 @@
 session_start();
 include('../../connection/connection.php');
 
+$filter_date = isset($_POST['filter_date']) ? $_POST['filter_date'] : '';
+$filter_estado = isset($_POST['filter_estado']) ? $_POST['filter_estado'] : '';
+
 // Consulta para obtener todas las citas junto con la información de los pacientes
-$sql = "SELECT citas.id_cita, pacientes.nombre, pacientes.telefono, citas.fecha_hora, citas.motivo, citas.comentarios
-    FROM citas
-    INNER JOIN pacientes ON citas.id_paciente = pacientes.id_paciente
-    ORDER BY citas.fecha_hora ASC";
-    
+$sql = "SELECT citas.id_cita, pacientes.nombre, pacientes.telefono, citas.fecha_hora, citas.motivo, citas.comentarios, 
+               IFNULL(pagos.monto_total, 'No asignado') as monto_total, 
+               IF(pagos.monto_total IS NULL, 'Pendiente', 'Pagado') as estado
+        FROM citas
+        INNER JOIN pacientes ON citas.id_paciente = pacientes.id_paciente
+        LEFT JOIN pagos ON citas.id_cita = pagos.id_cita
+        WHERE 1=1";
+
+if ($filter_date) {
+    $sql .= " AND DATE(citas.fecha_hora) = '$filter_date'";
+}
+
+if ($filter_estado) {
+    $sql .= " AND IF(pagos.monto_total IS NULL, 'Pendiente', 'Pagado') = '$filter_estado'";
+}
+
+$sql .= " ORDER BY citas.fecha_hora ASC";
+
 $result = $conn->query($sql);
 ?>
 
@@ -54,7 +70,18 @@ $result = $conn->query($sql);
     </div>
     <main>
         <section class="appointment-list">
-            <h2>Mis Citas</h2>
+            <h2>Todas las Citas</h2>
+            <form method="post" class="filter-form">
+                <label for="filter_date">Fecha:</label>
+                <input type="date" name="filter_date" id="filter_date" value="<?= htmlspecialchars($filter_date) ?>">
+                <label for="filter_estado">Estado:</label>
+                <select name="filter_estado" id="filter_estado">
+                    <option value="">Todos</option>
+                    <option value="Pendiente" <?= $filter_estado == 'Pendiente' ? 'selected' : '' ?>>Pendiente</option>
+                    <option value="Pagado" <?= $filter_estado == 'Pagado' ? 'selected' : '' ?>>Pagado</option>
+                </select>
+                <button type="submit" class="btn-primary">Filtrar</button>
+            </form>
             <table>
                 <thead>
                     <tr>
@@ -64,6 +91,8 @@ $result = $conn->query($sql);
                         <th>Hora</th>
                         <th>Motivo</th>
                         <th>Comentarios</th>
+                        <th>Monto Total</th>
+                        <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -78,11 +107,16 @@ $result = $conn->query($sql);
                         <td><?= $fecha_hora->format('H:i') ?></td>
                         <td><?= htmlspecialchars($row['motivo']) ?></td>
                         <td><?= htmlspecialchars($row['comentarios']) ?></td>
+                        <td><?= htmlspecialchars($row['monto_total']) ?></td>
+                        <td><?= htmlspecialchars($row['estado']) ?></td>
                         <td>
-                            <form action="cancelar_cita.php" method="post" style="display:inline;">
-                                <input type="hidden" name="id_cita" value="<?= $row['id_cita'] ?>">
-                                <button type="submit" class="btn btn-danger">Cancelar</button>
-                            </form>
+                            <a href="../control_de_pagos/registrar_pago.php?id_cita=<?= $row['id_cita'] ?>" class="btn-primary">Registrar Pago</a>
+                            <?php if ($row['monto_total'] === 'No asignado'): ?>
+                                <form action="eliminar_cita.php" method="post" style="display:inline;">
+                                    <input type="hidden" name="id_cita" value="<?= $row['id_cita'] ?>">
+                                    <button type="submit" class="btn btn-danger">Cancelar</button>
+                                </form>
+                            <?php endif; ?>
                         </td>
                     </tr>
                     <?php endwhile; ?>
@@ -108,3 +142,4 @@ $result = $conn->query($sql);
 $result->free();
 $conn->close();
 ?>
+
