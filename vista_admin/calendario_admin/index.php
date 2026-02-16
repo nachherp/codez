@@ -5,9 +5,8 @@ include('../../connection/connection.php');
 $filter_date = isset($_POST['filter_date']) ? $_POST['filter_date'] : '';
 $filter_estado = isset($_POST['filter_estado']) ? $_POST['filter_estado'] : '';
 
-// Consulta para obtener todas las citas junto con la información de los pacientes
-$sql = "SELECT citas.id_cita, pacientes.nombre, pacientes.telefono, citas.fecha_hora, citas.motivo, citas.comentarios, 
-               IFNULL(pagos.monto_total, 'No asignado') as monto_total, 
+$sql = "SELECT citas.id_cita, pacientes.nombre, pacientes.telefono, citas.fecha_hora, citas.motivo, citas.comentarios,
+               IFNULL(pagos.monto_total, 'No asignado') as monto_total,
                IF(pagos.monto_total IS NULL, 'Pendiente', 'Pagado') as estado
         FROM citas
         INNER JOIN pacientes ON citas.id_paciente = pacientes.id_paciente
@@ -23,65 +22,59 @@ if ($filter_estado) {
 }
 
 $sql .= " ORDER BY citas.fecha_hora ASC";
-
 $result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administración de Citas</title>
-    <link rel="stylesheet" href="../../vista_cliente/administrar_cita/style.css">
+    <title>Denthub Admin | Agenda</title>
+    <link rel="stylesheet" href="../../style/normalize.css">
+    <link rel="stylesheet" href="../admin-ui.css">
 </head>
-
 <body>
-    <header>
-        <nav>
-            <div class="arriba">
-                <a class="navbar-brand" href="#">
-                    <img src="../../img/logo.png" width="100" height="50" alt="">
-                </a>
-                <div class="navbar_items">
-                    <li><a href="../index.php">Home</a></li>
-                    <li><a href="#">Mis citas</a></li>
-                    <li><a href="../pacientes/index.php">Pacientes</a></li>
-                    <li><a href="../control_de_pagos/index.php">Control de pagos</a></li>
-        
-                    <div class="contenedor_icons">
-                        <a class="navbar-brand" href="../registro/index.html">
-                            <img src="../../img/usuario (1).png" alt="" width="30" height="24">
-                        </a>
-                        <a class="navbar-brand" href="https://www.google.com.mx/maps/preview">
-                            <img src="../../img/marcador (2).png" alt="" width="30" height="24">
-                        </a>
-                        <a class="navbar-brand" href="#">
-                            <img src="../../img/hogar (2).png" alt="" width="30" height="24">
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="xd">
-        <h1>Administrar Citas</h1>
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="logo" href="../../index.html"><img src="../../img/logo.png" alt="Denthub"></a>
+        <ul class="nav-links">
+            <li><a href="../index.php">Dashboard</a></li>
+            <li><a class="active" href="#">Agenda</a></li>
+            <li><a href="../pacientes/index.php">Pacientes</a></li>
+            <li><a href="../control_de_pagos/index.php">Pagos</a></li>
+        </ul>
     </div>
-    <main>
-        <section class="appointment-list">
-            <h2>Todas las Citas</h2>
-            <form method="post" class="filter-form">
-                <label for="filter_date">Fecha:</label>
+</header>
+
+<main class="page">
+    <section class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>Administrar citas</h2>
+                <p>Filtra por fecha y estado para priorizar tareas clínicas.</p>
+            </div>
+        </div>
+
+        <form method="post" class="filters" aria-label="Filtros de citas">
+            <div class="field">
+                <label for="filter_date">Fecha</label>
                 <input type="date" name="filter_date" id="filter_date" value="<?= htmlspecialchars($filter_date) ?>">
-                <label for="filter_estado">Estado:</label>
+            </div>
+            <div class="field">
+                <label for="filter_estado">Estado</label>
                 <select name="filter_estado" id="filter_estado">
                     <option value="">Todos</option>
                     <option value="Pendiente" <?= $filter_estado == 'Pendiente' ? 'selected' : '' ?>>Pendiente</option>
                     <option value="Pagado" <?= $filter_estado == 'Pagado' ? 'selected' : '' ?>>Pagado</option>
                 </select>
-                <button type="submit" class="btn-primary">Filtrar</button>
-            </form>
+            </div>
+            <div class="field" style="align-self:flex-end;">
+                <button type="submit" class="btn">Filtrar</button>
+            </div>
+        </form>
+
+        <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
@@ -91,55 +84,57 @@ $result = $conn->query($sql);
                         <th>Hora</th>
                         <th>Motivo</th>
                         <th>Comentarios</th>
-                        <th>Monto Total</th>
+                        <th>Monto total</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while ($row = $result->fetch_assoc()): 
-                        $fecha_hora = new DateTime($row['fecha_hora']);
-                    ?>
-                    <tr>
-                        <td><?= htmlspecialchars($row['nombre']) ?></td>
-                        <td><?= htmlspecialchars($row['telefono']) ?></td>
-                        <td><?= $fecha_hora->format('Y-m-d') ?></td>
-                        <td><?= $fecha_hora->format('H:i') ?></td>
-                        <td><?= htmlspecialchars($row['motivo']) ?></td>
-                        <td><?= htmlspecialchars($row['comentarios']) ?></td>
-                        <td><?= htmlspecialchars($row['monto_total']) ?></td>
-                        <td><?= htmlspecialchars($row['estado']) ?></td>
-                        <td>
-                            <a href="../control_de_pagos/registrar_pago.php?id_cita=<?= $row['id_cita'] ?>" class="btn-primary">Registrar Pago</a>
-                            <?php if ($row['monto_total'] === 'No asignado'): ?>
-                                <form action="eliminar_cita.php" method="post" style="display:inline;">
-                                    <input type="hidden" name="id_cita" value="<?= $row['id_cita'] ?>">
-                                    <button type="submit" class="btn btn-danger">Cancelar</button>
-                                </form>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
+                <?php if ($result->num_rows > 0): ?>
+                    <?php while ($row = $result->fetch_assoc()):
+                        $fecha_hora = new DateTime($row['fecha_hora']); ?>
+                        <tr>
+                            <td><?= htmlspecialchars($row['nombre']) ?></td>
+                            <td><?= htmlspecialchars($row['telefono']) ?></td>
+                            <td><?= $fecha_hora->format('Y-m-d') ?></td>
+                            <td><?= $fecha_hora->format('H:i') ?></td>
+                            <td><?= htmlspecialchars($row['motivo']) ?></td>
+                            <td><?= htmlspecialchars($row['comentarios']) ?></td>
+                            <td><?= htmlspecialchars($row['monto_total']) ?></td>
+                            <td>
+                                <span class="badge <?= $row['estado'] === 'Pagado' ? 'success' : 'warning' ?>">
+                                    <?= htmlspecialchars($row['estado']) ?>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="actions">
+                                    <a href="../control_de_pagos/registrar_pago.php?id_cita=<?= $row['id_cita'] ?>" class="btn ghost">Registrar pago</a>
+                                    <?php if ($row['monto_total'] === 'No asignado'): ?>
+                                        <form action="eliminar_cita.php" method="post">
+                                            <input type="hidden" name="id_cita" value="<?= $row['id_cita'] ?>">
+                                            <button type="submit" class="btn danger">Cancelar</button>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
                     <?php endwhile; ?>
+                <?php else: ?>
+                    <tr><td colspan="9">No hay citas para los filtros seleccionados.</td></tr>
+                <?php endif; ?>
                 </tbody>
             </table>
-        </section>
-    </main>
-    <footer class="bg_footer">
-        <div class="footer-container">
-            <ul>
-                <li><a href="#aviso-privacidad">Aviso de privacidad</a></li>
-                <li><a href="#terminos-y-condiciones">Términos y condiciones</a></li>
-                <li><a href="#mapa-de-sitio">Mapa de sitio</a></li>
-            </ul>
-            <p>&copy; 2023 Dentavida. Todos los derechos reservados.</p>
         </div>
-    </footer>
-</body>
+    </section>
+</main>
 
+<footer class="footer">
+    <p>&copy; 2026 Denthub. Plataforma de gestión dental.</p>
+</footer>
+</body>
 </html>
 
 <?php
 $result->free();
 $conn->close();
 ?>
-
