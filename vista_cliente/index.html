@@ -1,83 +1,151 @@
-
-
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="preload" href="../style/style.css">
+    <title>Panel del paciente | DentHub</title>
     <link rel="preload" href="../style/normalize.css">
-    <link rel="stylesheet" href="../style/style.css">
     <link rel="stylesheet" href="../style/normalize.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-    <header>
-
+    <header class="topbar">
+        <div class="topbar__brand">
+            <img src="../img/logo.png" alt="Logo DentHub" width="96" height="44">
+            <div>
+                <p class="eyebrow">Mi espacio</p>
+                <h1>Panel del paciente</h1>
+            </div>
+        </div>
+        <nav class="topbar__actions" aria-label="Acciones rápidas">
+            <a class="btn btn--ghost" href="./servicios/index.html">Ver servicios</a>
+            <a class="btn btn--secondary" href="./calendario_cliente/index.html">Mi calendario</a>
+            <a class="btn btn--primary" href="./administrar_cita/agendar/index.php">Agendar cita</a>
+        </nav>
     </header>
-    <div class="cardbody">
-        <div class="page-content page-container" id="page-content">
-            <div class="padding">
-                <div class="row container d-flex justify-content-center">
-                    <div class="col-xl-6 col-md-12">
-                        <div class="card user-card-full">
-                            <div class="row m-l-0 m-r-0">
-                                <div class="col-sm-4 bg-c-lite-green user-profile">
-                                    <div class="card-block text-center text-white">
-                                        <div class="m-b-25">
-                                            <img src="../img/usuario (1).png" class="img-radius"
-                                                alt="User-Profile-Image">
-                                        </div>
-                                        <div class="nombre">
-                                        <h6 class="f-w-600">Bienvenid@</h6>
-                                        <p>Juan</p>
-                                            <i class=" mdi mdi-square-edit-outline feather icon-edit m-t-10 f-16"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-8">
-                                    <div class="card-block">
-                                        <h6 class="m-b-20 p-b-5 b-b-default f-w-600">Información</h6>
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <p class="m-b-10 f-w-600">Email</p>
-                                                <h6 class="text-muted f-w-400">Juan@gmail.com</h6>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <p class="m-b-10 f-w-600">Telefono</p>
-                                                <h6 class="text-muted f-w-400">98979989898</h6>
-                                            </div>
-                                        </div>
-                                        <h6 class="m-b-20 m-t-40 p-b-5 b-b-default f-w-600">Información</h6>
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <p class="m-b-10 f-w-600">Ocupación</p>
-                                                <h6 class="text-muted f-w-400"></h6>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <p class="m-b-10 f-w-600">Pendientes</p>
-                                                <h6 class="text-muted f-w-400">Cita 01//07/2024 8:00 am</h6>
-                                                <h6 class="text-muted f-w-400">Cita 01//07/2024 3:00 pm</h6>
-                                                <h6 class="text-muted f-w-400">Cita 01//07/2024 5:00 pm</h6>
-                                            </div>
-                                        </div>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
+    <main class="dashboard">
+        <section class="hero card">
+            <div class="hero__profile">
+                <img src="../img/usuario (1).png" class="avatar" alt="Foto de perfil de Juan">
+                <div>
+                    <p class="eyebrow">Bienvenido de nuevo</p>
+                    <h2>Juan Pérez</h2>
+                    <p class="muted">Tu salud dental al día comienza con una buena planificación.</p>
+                    <div class="hero__badges">
+                        <span class="badge badge--ok">Perfil verificado</span>
+                        <span class="badge">Último control: 10/07/2024</span>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+            <div class="hero__metrics" aria-label="Indicadores del paciente">
+                <article>
+                    <p>Próxima cita</p>
+                    <strong>18 Jul · 08:00 AM</strong>
+                </article>
+                <article>
+                    <p>Pendientes</p>
+                    <strong>3 citas</strong>
+                </article>
+                <article>
+                    <p>Estado de pago</p>
+                    <strong>Al corriente</strong>
+                </article>
+            </div>
+        </section>
+
+        <section class="content-grid">
+            <article class="card">
+                <div class="section-title">
+                    <h3>Tu información</h3>
+                    <a href="./actualizar_perfil.php" class="link-action">Editar perfil</a>
+                </div>
+                <dl class="data-list">
+                    <div>
+                        <dt>Correo electrónico</dt>
+                        <dd>juan@gmail.com</dd>
+                    </div>
+                    <div>
+                        <dt>Teléfono</dt>
+                        <dd>98979989898</dd>
+                    </div>
+                    <div>
+                        <dt>Ocupación</dt>
+                        <dd>Diseñador UX</dd>
+                    </div>
+                    <div>
+                        <dt>Preferencia de contacto</dt>
+                        <dd>WhatsApp</dd>
+                    </div>
+                </dl>
+            </article>
+
+            <article class="card">
+                <div class="section-title">
+                    <h3>Próximas citas</h3>
+                    <a href="./administrar_cita/agendar/index.php" class="link-action">Administrar</a>
+                </div>
+                <ul class="appointments" aria-label="Lista de próximas citas">
+                    <li>
+                        <div>
+                            <p class="appointment__title">Limpieza dental</p>
+                            <p class="muted">18/07/2024 · 08:00 AM · Sucursal Centro</p>
+                        </div>
+                        <span class="badge badge--warning">Confirmar</span>
+                    </li>
+                    <li>
+                        <div>
+                            <p class="appointment__title">Valoración ortodoncia</p>
+                            <p class="muted">22/07/2024 · 03:00 PM · Dr. Martínez</p>
+                        </div>
+                        <span class="badge">Programada</span>
+                    </li>
+                    <li>
+                        <div>
+                            <p class="appointment__title">Revisión de caries</p>
+                            <p class="muted">25/07/2024 · 05:00 PM · Sucursal Norte</p>
+                        </div>
+                        <span class="badge">Programada</span>
+                    </li>
+                </ul>
+                <div class="stack-actions">
+                    <a class="btn btn--secondary" href="./administrar_cita/agendar/editar_cita.php">Reagendar</a>
+                    <a class="btn btn--ghost" href="./administrar_cita/agendar/eliminar_cita.php">Cancelar cita</a>
+                </div>
+            </article>
+
+            <article class="card card--full">
+                <div class="section-title">
+                    <h3>Confianza y soporte</h3>
+                    <a href="tel:5555555555" class="link-action">Llamar a clínica</a>
+                </div>
+                <div class="trust-grid">
+                    <div>
+                        <h4>¿Por qué DentHub?</h4>
+                        <ul class="check-list">
+                            <li>Protocolos estrictos de higiene y esterilización.</li>
+                            <li>Especialistas certificados en ortodoncia y rehabilitación.</li>
+                            <li>Recordatorios automáticos para no perder tus citas.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>¿Necesitas ayuda?</h4>
+                        <p class="muted">Si necesitas cambiar tu horario o tienes dolor dental, contáctanos y te damos prioridad.</p>
+                        <div class="stack-actions">
+                            <a class="btn btn--primary" href="https://wa.me/525555555555">WhatsApp</a>
+                            <a class="btn btn--secondary" href="mailto:contacto@denthub.com">Enviar correo</a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+    </main>
+
     <footer>
         <div class="footer-container">
             <ul>
@@ -85,13 +153,9 @@
                 <li><a href="#terminos-y-condiciones">Términos y condiciones</a></li>
                 <li><a href="#mapa-de-sitio">Mapa de sitio</a></li>
             </ul>
-            <p>&copy; 2023 Dentavida. Todos los derechos reservados.</p>
-            
+            <p>&copy; 2024 DentHub. Todos los derechos reservados.</p>
         </div>
     </footer>
-
 </body>
-
-
 
 </html>
